@@ -1,0 +1,62 @@
+body {
+    overflow:hidden;
+}
+.main_menu {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.main_menu > .title {
+    display: flex;
+    flex: 2;
+
+    align-items: center;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.main_menu > .label_group_select {
+    display: flex;
+    flex: 1;
+    
+    align-items: center;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.main_menu > .button_container {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.button_container > button {
+    display: flex;
+    flex: 1;
+    height: 10vh;
+    text-align: center;
+    align-items: center;
+}
+
+.button_container > .filled_button {
+    background-color: green;
+}
+
+.main_menu > .continue_container {
+    display: flex;
+    flex: 1;
+
+    justify-content: space-around;
+    align-items: center;
+}
+
+.continue_container > button {
+    display: flex;
+    flex: 1;
+}

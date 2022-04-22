@@ -1,0 +1,81 @@
+.image_search {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.image_search > .back_button {
+    display: flex;
+    flex: 1;
+    width: 10vw;
+    height: 100vh;
+    justify-content: center;
+    text-align: center;
+    background-color: darkgray;
+}
+
+.image_search > .box_search {
+    display: flex;
+    flex: 6;
+    flex-direction: column;
+}
+
+.box_search > .search_panel {
+    display: flex;
+    flex: 1;
+    width: 60vw;
+    height: 15vh;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: lightblue;
+}
+
+.search_panel > label {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+}
+
+.box_search > .search_grid {
+    display: flex;
+    flex: 4;
+    width: 60vw;
+    height: 70vh;
+    background-color: pink;
+
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.search_grid > img {
+    display: flex;
+    margin: 5%;
+    width: 15%;
+    height: 15%;
+}
+
+.box_search > .search_nav {
+    display: flex;
+    flex: 1;
+    width: 60vw;
+    height: 15vh;
+    text-align: center;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: lightgreen;
+}
+
+.image_search > .box_info {
+    display: flex;
+    flex: 3;
+    width: 30vw;
+    height: 100vh;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    background-color: goldenrod;
+}
