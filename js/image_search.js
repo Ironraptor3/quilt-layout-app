@@ -8,25 +8,32 @@ let sortInput = null;
 let sortAsc = null;
 
 // WARNING: Pages is 1-indexed to support user interface
+// Technically pages is redundant, but keeps a better entity boundary
 const pages = new Map();
 const pageInputs = new Map();
 const pageMaxs = new Map();
 
+// Info for selecting images and viewing their details
 let selected = -1;
 let selectGrid = null;
 let selectInfo = null;
 
+// Gets the index based on the grid + offset
 export const getCSVIndex = (grid, offset) => {
+    // (page-1)*(imgs_per_page) + offset
     const fsIndex = (pages.get(grid)-1) * grid.children.length + offset;
-    const csvIndex = fsCSV[fsIndex];
-    return csvIndex == null?-1:csvIndex;
+    const csvIndex = fsCSV[fsIndex]; // fsCSV contains indices of the main csv data
+    return csvIndex == null?-1:csvIndex; // Return -1 if not found
 }
 
+// Update the info displayed
 const updateInfo = () => {
+    // Default value is this
     let info = "Click an image to display its metrics."
     if (selected !== -1) {
         const index = getCSVIndex(selectGrid, selected);
         if (index > -1) {
+            // Gets the image and parses all the data in html
             const img = data.csv[index];
             info = `name: ${img.name}<br/>path: ${img.image}`;
             const metrics = getMetrics(); 
@@ -35,16 +42,21 @@ const updateInfo = () => {
             }
         }
     }
+    // Set the innerHTML to the info
     selectInfo.innerHTML = info;
 }
 
+// Updates the selected image in the large grid
 const setSelected = (index) => {
+    // If clicked again, remove selection
     if (selected === index) {
         selected = -1;
     }
+    // Update selection otherwise
     else {
         selected = index;
     }
+    // Update outlines
     let i = 0;
     for (const child of selectGrid.children) {
         if (i===selected) {
@@ -55,9 +67,11 @@ const setSelected = (index) => {
         }
         ++i;
     }
+    // Update the info accordingly
     updateInfo();
 }
 
+// Inits the details view separately - for modularity
 const detailsInit = () => {
     selectGrid = document.getElementById("search_grid_large");
     selectInfo = document.getElementById("box_info");
@@ -72,20 +86,24 @@ const detailsInit = () => {
     }
 }
 
+// For showing an image to be loaded from path
 export const showImg = (element, path) => {
-    element.style.display = "none";
+    element.style.display = "none"; // Hides the image unti loaded
     if (path != null) {
         const reader = new FileReader();
         reader.onload = () => {
             if (reader.result != null) {
-                element.style.display = "";
-                element.setAttribute("src", reader.result);
+                // I wanted to do this on load, but it seems to not behave as
+                // I would think
+                element.style.display = ""; // Show image on success
+                element.src = reader.result; // Update image source
             }
         }
         reader.readAsDataURL(path);
     }
 }
 
+// Shows all images on the grid
 const showImgs = (grid) => {
     const children = grid.children;
     if (children.length > 0) {
@@ -101,18 +119,21 @@ const showImgs = (grid) => {
     }
 }
 
+// ShowImgs on all initialized grids
 const updateGrids = () => {
     for (const grid of pages.keys()) {
         showImgs(grid);
     }
 }
 
+// Gets the maximum page that this element should have
 const getMaxPage = (element) => {
     return element.children.length < 1?
         1
         :Math.ceil(fsCSV.length / element.children.length);
 }
 
+// Updates all the max pages
 const updateMaxPages = () => {
     for (const element of pageMaxs.keys()) {
         const maxPage = getMaxPage(element);
@@ -121,15 +142,17 @@ const updateMaxPages = () => {
     }
 }
 
+// Sets the page of the target, and updates other pages accordingly
 const setPages = (page, target) => {
     for (const element of pages.keys()) {
-        let p = page; // This was a bad bug
+        let p = page; // This was a bad bug ( I was directly changing page every iteration )
         if (target != null) {
             const ratio = target.children.length/element.children.length;
+            // Sets the page of this grid in relation to the grid being set
             p = Math.floor(ratio*(p-1))+1;
         }
-        pageInputs.get(element).value = p;
-        pages.set(element,p);
+        pageInputs.get(element).value = p; // Update the page input
+        pages.set(element,p); // Update the value in the map
     }
     updateGrids();
 
@@ -139,12 +162,14 @@ const setPages = (page, target) => {
     }
 }
 
+// Updates the filter sort data (fsCSV)
 const updateFS = () => {
     // Check for empty string
     const filter = filterInput.value;
     fsCSV = data.csv.map(
         (_, index) => index // Save indices
     );
+    // Filter
     if (filter !== "") {
         fsCSV = fsCSV.filter( (x) => {
             return data.csv[x]["name"].includes(filter);
@@ -152,7 +177,7 @@ const updateFS = () => {
     }
     const sort = sortInput.value;
     const asc = sortAsc.checked;
-
+    // Then sort
     if (sort !== "None") {
         fsCSV.sort( (a,b) => {
             // Get Values
@@ -181,9 +206,11 @@ const updateFS = () => {
 
     // Update pages
     updateMaxPages();
+    // Reset pages to start
     setPages(1, null);
 }
 
+// Gets the metrics associated with images (-name and -image)
 export const getMetrics = () => {
     // Tooling
     // Could be written slightly more neatly
@@ -197,11 +224,13 @@ export const getMetrics = () => {
                 metrics.push(metric);
             }
         }
+        // Sort in alphabetical order
         metrics.sort();
         return metrics;
     }
 }
 
+// Initializes the inputs used for the sorting functionality
 const sortInputInit = () => {
     const metrics = getMetrics();
     for (const metric of metrics) {
@@ -212,7 +241,7 @@ const sortInputInit = () => {
     }
 }
 
-// Again, this may be too overspecific - TODO -
+// Again, this may be too overspecific
 // Using 1-indexing here isn't great
 const pageChangeInit = (controls_id, grid_id) => {
     const controls = document.getElementById(controls_id);
@@ -244,11 +273,13 @@ const pageChangeInit = (controls_id, grid_id) => {
     });
 }
 
+// Initializes all the page change groups
 const pageChangeAllInit = () => {
     pageChangeInit("search_controls_small", "search_grid_small");
     pageChangeInit("search_controls_large", "search_grid_large");
 }
 
+// Initializes all of the image search functionality
 export const imageSearchInit = () => {
     // Start at 1 (first index)
     pages.set(document.getElementById("search_grid_small"), 1);

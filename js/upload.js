@@ -1,3 +1,4 @@
+// Holds the upload data
 export const data = {
     csv: null,
     files: null,
@@ -5,12 +6,14 @@ export const data = {
     meta: null,
 };
 
+// A list of buttons
 const uploadButtons = [
 ];
-
+// A list of invisible inputs
 const uploadInputs = [
 ];
 
+// When input is changed, update the state of the begin button / button graphics
 const updateBegin = () => {
     const begin = document.getElementById("button_begin");
     
@@ -18,16 +21,16 @@ const updateBegin = () => {
     let i = 0;
     for (const d in data) {
         if (data[d] == null) {
-            uploadButtons[i].setAttribute("class", "");
+            uploadButtons[i].setAttribute("class", ""); // Does not have the data
             filled = false;
         }
         else {
-            uploadButtons[i].setAttribute("class", "filled_button");
+            uploadButtons[i].setAttribute("class", "filled_button"); // Turn green for complete
         }
         ++i;
     }
 
-    begin.disabled = !filled;
+    begin.disabled = !filled; // Enable the button if all inputs satisfied
 }
 
 // Fixes each element of the metrics data
@@ -39,7 +42,7 @@ const adjustData = (data) => {
     //Find name of image to display
     const path = data['image']
     //Credit to https://stackoverflow.com/a/25221100
-    data['name'] = path.split("/").pop();
+    data['name'] = path.split("/").pop().split(".")[0];
 }
 
 // Loads the Metrics File
@@ -47,11 +50,11 @@ const loadMetricsFile = (input) => {
     if (input.files.length > 0) {
         const reader = new FileReader();
         reader.onload = () => {
-            data.csv = $.csv.toObjects(reader.result);
-            data.csv.forEach(adjustData);
+            data.csv = $.csv.toObjects(reader.result); // Use jquery.csv to read
+            data.csv.forEach(adjustData); // Adjust the data
             updateBegin();
         }
-        reader.readAsBinaryString(input.files[0]);
+        reader.readAsBinaryString(input.files[0]); // Read the file as a string
     }
     else {
         data.csv = null;
@@ -77,6 +80,7 @@ const loadMetricsFolder = (input) => {
     }
 }
 
+// Loads the layout image
 const loadLayout = (input) => {
     if (input.files.length > 0) {
         data.layout = input.files[0];
@@ -88,21 +92,24 @@ const loadLayout = (input) => {
     }
 }
 
+// Loads the layout metadata
 const loadMeta = (input) => {
     if (input.files.length > 0) {
         const reader = new FileReader();
         reader.onload = () => {
             data.meta = []
             //Help from https://stackoverflow.com/a/54502026/18789057
-            for (const line of reader.result.split(/\r?\n/)) {
+            for (const line of reader.result.split(/\r?\n/)) { // Read by line
                 if (line !== "") {
                     const vals = line.split(",");
+                    // Set up node (x,y are in % of image size)
                     const node = {
                         x: parseFloat(vals[1]),
                         y: parseFloat(vals[0]),
                         dists: []
                     };
 
+                    // Distance to closest nodes
                     for (let i = 2; i < vals.length; i+=2) {
                         node.dists.push({
                             index: parseInt(vals[i]),
@@ -123,6 +130,7 @@ const loadMeta = (input) => {
     }
 }
 
+// The names of each upload/input
 const uploadNames = [
     "metrics",
     "images",
@@ -130,6 +138,7 @@ const uploadNames = [
     "meta",
 ];
 
+// Corresponding updates
 const changeFcns = [
     loadMetricsFile,
     loadMetricsFolder,
@@ -137,6 +146,7 @@ const changeFcns = [
     loadMeta,
 ];
 
+// Init all upload information
 export const uploadInit = (doc)=> {
     for (let i = 0; i < uploadNames.length; ++i) {
         const name = uploadNames[i];
